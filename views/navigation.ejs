@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Dashboard - Puerto Galera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <style>
+        /* 3D Effect for Map */
+        #map {
+            height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 3px solid #1e3a8a;
+        }
+
+        /* Sidebar Animation */
+        .sidebar-active {
+            transform: translateX(0) !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="w-64 bg-blue-900 text-white p-5 space-y-6 fixed inset-y-0 left-0 transform -translate-x-full transition-all duration-300 ease-in-out md:relative md:translate-x-0 z-50">
+            <h2 class="text-2xl font-bold">GaleraGo</h2>
+            <nav class="space-y-2">
+                <a href="#" class="block py-3 px-4 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold">Dashboard</a>
+                <a href="/booking" class="block py-3 px-4 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold">Booking</a>
+                <a href="#" class="block py-3 px-4 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold">Island</a>
+                <a href="/navigation" class="block py-3 px-4 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold">Navigation</a>
+                <a href="#" class="block py-3 px-4 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold">About</a>
+                <a href="/" class="block py-3 px-4 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold">Home</a>
+                <a href="/logout" class="block py-3 px-4 bg-red-600 hover:bg-red-700 rounded-md text-center font-semibold">Logout</a>
+            </nav>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Navbar -->
+            <header class="bg-white shadow-md p-4 flex justify-between items-center">
+                <button id="menu-btn" class="md:hidden bg-blue-900 text-white px-3 py-2 rounded">☰</button>
+                <h1 class="text-2xl font-semibold text-blue-900">Tourist Dashboard</h1>
+            </header>
+            
+            <!-- Main Content -->
+            <main class="p-6">
+                <h2 class="text-xl font-bold text-blue-900">Welcome to Puerto Galera</h2>
+                <p class="text-gray-600">Discover the best places to visit, dine, and relax.</p>
+
+                <!-- Map Section -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">Explore Puerto Galera</h3>
+                    
+                    <!-- Destination Selector -->
+                    <div class="mb-4">
+                        <label for="destination" class="block text-sm font-medium text-gray-700">Select Destination:</label>
+                        <select id="destination" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option value="13.5015,120.9511">White Beach</option>
+                            <option value="13.5291,120.9759">Sabang Beach</option>
+                            <option value="13.4152,120.9938">Tamaraw Falls</option>
+                            <option value="13.4958,120.9653">Coral Garden Snorkeling</option>
+                            <option value="13.5010,120.9682">Haligi Beach</option>
+                            <option value="13.5125,120.9552">Aninuan Beach</option>
+                            <option value="13.4992,120.9443">Bayanan Beach</option>
+                            <option value="13.5273,120.9721">Big La Laguna Beach</option>
+                            <option value="13.5152,120.9669">Small La Laguna Beach</option>
+                            <option value="13.4978,120.9784">Underwater Cave</option>
+                            <option value="13.4785,120.9573">Lagoon Beach</option>
+                            <option value="13.5378,120.9812">Muelle Bay</option>
+                            <option value="13.5103,120.9604">Talipanan Falls</option>
+                            <option value="13.5231,120.9685">Infinity Farm</option>
+                            <option value="13.5386,120.9734">Puerto Galera Yacht Club</option>
+                            <option value="13.5148,120.9706">Coco Beach</option>
+                            <option value="13.5296,120.9863">Sabang Wrecks (Diving Site)</option>
+                            <option value="13.5348,120.9824">The Canyons (Diving Site)</option>
+                            <option value="13.5402,120.9809">Shark Cave (Diving Site)</option>
+                            <option value="13.5062,120.9628">Mangrove Conservation Area</option>
+                            <option value="13.4987,120.9556">Tukuran Falls</option>
+                            <option value="13.4732,120.9451">Pebble Beach</option>
+                            <option value="13.5299,120.9771">Sabang Nightlife District</option>
+                            <option value="13.5168,120.9734">La Laguna Point (Diving Site)</option>
+                            <option value="13.4871,120.9656">San Antonio Island</option>
+                            <option value="13.4934,120.9523">Virgin Beach</option>
+                            <option value="13.4875,120.9578">Long Beach</option>
+                            <option value="13.4962,120.9699">Boquete Island</option>
+                            <option value="13.5054,120.9597">Puerto Galera Public Market</option>
+                            <option value="13.5106,120.9672">Extreme Sports Puerto Galera</option>
+                            <option value="13.5141,120.9547">El Canonero Diving Beach Resort</option>
+                            <option value="13.5035,120.9501">Mindoro Sling Bar</option>
+                            <option value="13.4856,120.9633">Verde Island (Diving Site)</option>
+                            <option value="13.4973,120.9728">Laguna Point</option>
+                            <option value="13.4804,120.9642">Hidden Valley</option>
+                            <option value="13.4892,120.9739">Sinandigan Lighthouse</option>
+                            <option value="13.4823,120.9518">Talipanan Mangrove Forest</option>
+                            <option value="13.5212,120.9621">West Escarceo Reef (Diving Site)</option>
+                            <option value="13.4950,120.9457">Coral Cove (Diving Site)</option>
+                            <option value="13.4923,120.9705">Monkey Beach</option>
+                            <option value="13.4819,120.9607">Bamboo House Beach</option>
+                            <option value="13.5342,120.9853">Sabang Bay</option>
+                            <option value="13.5161,120.9743">Batangas Channel</option>
+                            <option value="13.5007,120.9534">Coconut Point</option>
+                            <option value="13.5189,120.9652">White Wall (Diving Site)</option>
+                            <option value="13.5193,120.9728">Ernie’s Point (Diving Site)</option>
+                            <option value="13.5265,120.9903">Manila Channel (Diving Site)</option>
+                            <option value="13.5139,120.9575">Mariners' Cove</option>
+                            <option value="13.5237,120.9602">Turtle Sanctuary</option>
+                            <option value="13.5098,120.9506">Kuweba Cansubong (Cave)</option>
+                        </select>
+                        <button id="getDirections" class="mt-3 w-full bg-blue-900 text-white py-3 rounded-md font-bold text-lg hover:bg-blue-800 transition">Get Directions</button>
+                    </div>
+
+                    <div id="map"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-active');
+        });
+
+        // Initialize the Map with 3D Perspective
+        const map = L.map('map').setView([13.5025, 120.9674], 13); // Centered at Puerto Galera
+
+        // Load Map Tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add Markers for Popular Places
+        const places = [
+        { name: "White Beach", coords: [13.5015, 120.9511] },
+        { name: "Sabang Beach", coords: [13.5291, 120.9759] },
+        { name: "Tamaraw Falls", coords: [13.4152, 120.9938] },
+        { name: "Coral Garden Snorkeling", coords: [13.4958, 120.9653] },
+        { name: "Haligi Beach", coords: [13.5010, 120.9682] },
+        { name: "Aninuan Beach", coords: [13.5125, 120.9552] },
+        { name: "Bayanan Beach", coords: [13.4992, 120.9443] },
+        { name: "Big La Laguna Beach", coords: [13.5273, 120.9721] },
+        { name: "Small La Laguna Beach", coords: [13.5152, 120.9669] },
+        { name: "Underwater Cave", coords: [13.4978, 120.9784] },
+        { name: "Lagoon Beach", coords: [13.4785, 120.9573] },
+        { name: "Muelle Bay", coords: [13.5378, 120.9812] },
+        { name: "Talipanan Falls", coords: [13.5103, 120.9604] },
+        { name: "Infinity Farm", coords: [13.5231, 120.9685] },
+        { name: "Puerto Galera Yacht Club", coords: [13.5386, 120.9734] },
+        { name: "Coco Beach", coords: [13.5148, 120.9706] },
+        { name: "Sabang Wrecks (Diving Site)", coords: [13.5296, 120.9863] },
+        { name: "The Canyons (Diving Site)", coords: [13.5348, 120.9824] },
+        { name: "Shark Cave (Diving Site)", coords: [13.5402, 120.9809] },
+        { name: "Mangrove Conservation Area", coords: [13.5062, 120.9628] },
+        { name: "Tukuran Falls", coords: [13.4987, 120.9556] },
+        { name: "Pebble Beach", coords: [13.4732, 120.9451] },
+        { name: "Sabang Nightlife District", coords: [13.5299, 120.9771] },
+        { name: "La Laguna Point (Diving Site)", coords: [13.5168, 120.9734] },
+        { name: "San Antonio Island", coords: [13.4871, 120.9656] },
+        { name: "Virgin Beach", coords: [13.4934, 120.9523] },
+        { name: "Long Beach", coords: [13.4875, 120.9578] },
+        { name: "Boquete Island", coords: [13.4962, 120.9699] },
+        { name: "Puerto Galera Public Market", coords: [13.5054, 120.9597] },
+        { name: "Extreme Sports Puerto Galera", coords: [13.5106, 120.9672] },
+        { name: "El Canonero Diving Beach Resort", coords: [13.5141, 120.9547] },
+        { name: "Mindoro Sling Bar", coords: [13.5035, 120.9501] },
+        { name: "Verde Island (Diving Site)", coords: [13.4856, 120.9633] },
+        { name: "Laguna Point", coords: [13.4973, 120.9728] },
+        { name: "Hidden Valley", coords: [13.4804, 120.9642] },
+        { name: "Sinandigan Lighthouse", coords: [13.4892, 120.9739] },
+        { name: "Talipanan Mangrove Forest", coords: [13.4823, 120.9518] },
+        { name: "West Escarceo Reef (Diving Site)", coords: [13.5212, 120.9621] },
+        { name: "Coral Cove (Diving Site)", coords: [13.4950, 120.9457] },
+        { name: "Monkey Beach", coords: [13.4923, 120.9705] },
+        { name: "Bamboo House Beach", coords: [13.4819, 120.9607] },
+        { name: "Sabang Bay", coords: [13.5342, 120.9853] },
+        { name: "Batangas Channel", coords: [13.5161, 120.9743] },
+        { name: "Coconut Point", coords: [13.5007, 120.9534] },
+        { name: "White Wall (Diving Site)", coords: [13.5189, 120.9652] },
+        { name: "Ernie’s Point (Diving Site)", coords: [13.5193, 120.9728] },
+        { name: "Manila Channel (Diving Site)", coords: [13.5265, 120.9903] },
+        { name: "Mariners' Cove", coords: [13.5139, 120.9575] },
+        { name: "Turtle Sanctuary", coords: [13.5237, 120.9602] },
+        { name: "Kuweba Cansubong (Cave)", coords: [13.5098, 120.9506] },
+        ];
+
+        places.forEach(place => {
+            L.marker(place.coords).addTo(map)
+                .bindPopup(`<b>${place.name}</b>`);
+        });
+
+        // Routing Functionality
+        let routeControl;
+
+        document.getElementById("getDirections").addEventListener("click", function() {
+            const destination = document.getElementById("destination").value;
+
+            if (!destination) {
+                alert("Please select a destination.");
+                return;
+            }
+
+            const [destLat, destLng] = destination.split(",").map(Number);
+
+            if (routeControl) {
+                map.removeControl(routeControl);
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    routeControl = L.Routing.control({
+                        waypoints: [
+                            L.latLng(userLat, userLng),
+                            L.latLng(destLat, destLng)
+                        ],
+                        routeWhileDragging: true,
+                        createMarker: function(i, waypoint, n) {
+                            let markerOptions = {};
+                            if (i === 0) {
+                                markerOptions.icon = L.icon({
+                                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+                                    iconSize: [30, 30]
+                                });
+                            }
+                            return L.marker(waypoint.latLng, markerOptions);
+                        }
+                    }).addTo(map);
+                }, () => {
+                    alert("Location access denied. Unable to fetch directions.");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        });
+    </script>
+</body>
+</html>
